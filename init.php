@@ -41,6 +41,14 @@ spl_autoload_register('_autoloader');
 
 $primaryRootPath = $root_path;
 $secondaryRootPath = realpath($root_path . '..') . DIRECTORY_SEPARATOR;
+
+if (class_exists('Db')) {
+    Db::loadDotEnv($primaryRootPath . '.env');
+    if ($secondaryRootPath !== $primaryRootPath) {
+        Db::loadDotEnv($secondaryRootPath . '.env');
+    }
+}
+
 $configFile = $primaryRootPath . 'config.php';
 
 if (!file_exists($configFile) && file_exists($secondaryRootPath . 'config.php')) {
@@ -61,7 +69,7 @@ if (!file_exists($configFile)) {
     }
 }
 
-if (!file_exists($root_path .  File::pathFixer('system/orm.php'))) {
+if (!file_exists($root_path . File::pathFixer('system/orm.php'))) {
     echo $root_path . "orm.php file not found";
     die();
 }
@@ -120,24 +128,24 @@ foreach ($result as $value) {
     $config[$value['setting']] = $value['value'];
 }
 
-if(empty($config['dashboard_Admin'])){
+if (empty($config['dashboard_Admin'])) {
     $config['dashboard_Admin'] = "12.7,5.12";
 }
 
-if(empty($config['dashboard_Agent'])){
+if (empty($config['dashboard_Agent'])) {
     $config['dashboard_Agent'] = "12.7,5.12";
 }
 
-if(empty($config['dashboard_Sales'])){
+if (empty($config['dashboard_Sales'])) {
     $config['dashboard_Sales'] = "12.7,5.12";
 }
 
-if(empty($config['dashboard_Customer'])){
+if (empty($config['dashboard_Customer'])) {
     $config['dashboard_Customer'] = "6,6";
 }
 
 
-$_c =  $config;
+$_c = $config;
 if (empty($http_proxy) && !empty($config['http_proxy'])) {
     $http_proxy = $config['http_proxy'];
     if (empty($http_proxyauth) && !empty($config['http_proxyauth'])) {
@@ -357,7 +365,8 @@ function _alert($text, $type = 'success', $url = "home", $time = 3)
             $text
         );
     }
-    if (!isset($ui)) return;
+    if (!isset($ui))
+        return;
     if (strlen($url) > 4) {
         if (substr($url, 0, 4) != "http") {
             $url = getUrl($url);

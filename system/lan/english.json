@@ -455,5 +455,9 @@
     "Change_title_in_user_Plan_order": "Change title in user Plan order",
     "Hotspot_Package": "Hotspot Package",
     "PPPOE_Package": "PPPOE Package",
-    "VPN_Package": "VPN Package"
+    "VPN_Package": "VPN Package",
+    "Error": "Error",
+    "Internal_Error": "Internal Error",
+    "Sorry__the_software_failed_to_process_the_request__if_it_still_happening__please_tell": "Sorry, the software failed to process the request, if it still happening, please tell",
+    "Try_Again": "Try Again"
 }

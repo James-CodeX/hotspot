@@ -2,6 +2,49 @@
 
 class Db
 {
+    public static function loadDotEnv($filePath)
+    {
+        if (!is_file($filePath) || !is_readable($filePath)) {
+            return;
+        }
+
+        $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($lines === false) {
+            return;
+        }
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || $line[0] === '#') {
+                continue;
+            }
+
+            $parts = explode('=', $line, 2);
+            if (count($parts) !== 2) {
+                continue;
+            }
+
+            $key = trim($parts[0]);
+            $value = trim($parts[1]);
+            if ($key === '' || self::env($key) !== null) {
+                continue;
+            }
+
+            $length = strlen($value);
+            if ($length >= 2) {
+                $first = $value[0];
+                $last = $value[$length - 1];
+                if (($first === '"' && $last === '"') || ($first === "'" && $last === "'")) {
+                    $value = substr($value, 1, -1);
+                }
+            }
+
+            putenv($key . '=' . $value);
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+        }
+    }
+
     public static function env($key, $default = null)
     {
         $value = getenv($key);
