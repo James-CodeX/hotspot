@@ -1,6 +1,6 @@
 # Use the official PHP image with Apache
 FROM php:8.2-apache
-EXPOSE 80
+EXPOSE 80 8080
 
 # Install necessary PHP extensions
 RUN apt-get update && apt-get install -y \
