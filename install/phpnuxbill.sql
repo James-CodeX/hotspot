@@ -6,25 +6,27 @@ SET time_zone = "+00:00";
 
 DROP TABLE IF EXISTS `tbl_appconfig`;
 CREATE TABLE `tbl_appconfig` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `setting` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `value` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
+  `value` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_bandwidth`;
 CREATE TABLE `tbl_bandwidth` (
-  `id` int UNSIGNED NOT NULL,
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `name_bw` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `rate_down` int UNSIGNED NOT NULL,
   `rate_down_unit` enum('Kbps','Mbps') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `rate_up` int UNSIGNED NOT NULL,
   `rate_up_unit` enum('Kbps','Mbps') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `burst` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''
+  `burst` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_customers`;
 CREATE TABLE `tbl_customers` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `password` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `photo` VARCHAR(128) NOT NULL DEFAULT '/user.default.jpg',
@@ -47,30 +49,33 @@ CREATE TABLE `tbl_customers` (
   `status` enum('Active','Banned','Disabled','Inactive','Limited','Suspended') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'Active',
   `created_by` int NOT NULL DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_login` datetime DEFAULT NULL
+  `last_login` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_customers_fields`;
 CREATE TABLE `tbl_customers_fields` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `customer_id` int NOT NULL,
   `field_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `field_value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `field_value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_logs`;
 CREATE TABLE `tbl_logs` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `date` datetime DEFAULT NULL,
   `type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `description` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `userid` int NOT NULL,
-  `ip` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `ip` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_payment_gateway`;
 CREATE TABLE `tbl_payment_gateway` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT 0,
   `gateway` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'xendit | midtrans',
@@ -89,12 +94,13 @@ CREATE TABLE `tbl_payment_gateway` (
   `created_date` datetime NOT NULL,
   `paid_date` datetime DEFAULT NULL,
   `trx_invoice` varchar(25) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'from tbl_transactions',
-  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1 unpaid 2 paid 3 failed 4 canceled'
+  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1 unpaid 2 paid 3 failed 4 canceled',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_plans`;
 CREATE TABLE `tbl_plans` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name_plan` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `id_bw` int NOT NULL,
   `price` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -119,21 +125,23 @@ CREATE TABLE `tbl_plans` (
   `plan_type` enum('Business','Personal') COLLATE utf8mb4_general_ci DEFAULT 'Personal' COMMENT 'For selecting account type',
   `device` varchar(32) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
   `on_login` TEXT NULL DEFAULT NULL,
-  `on_logout` TEXT NULL DEFAULT NULL
+  `on_logout` TEXT NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_pool`;
 CREATE TABLE `tbl_pool` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `pool_name` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `local_ip` varchar(40) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
   `range_ip` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `routers` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `routers` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_routers`;
 CREATE TABLE `tbl_routers` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `ip_address` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
@@ -143,12 +151,13 @@ CREATE TABLE `tbl_routers` (
   `status` ENUM('Online', 'Offline') DEFAULT 'Online',
   `last_seen` DATETIME,
   `coverage` VARCHAR(8) NOT NULL DEFAULT '0',
-  `enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '0 disabled'
+  `enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '0 disabled',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_transactions`;
 CREATE TABLE `tbl_transactions` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `invoice` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `username` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `user_id` int(11) NOT NULL DEFAULT 0,
@@ -162,12 +171,13 @@ CREATE TABLE `tbl_transactions` (
   `routers` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `type` enum('Hotspot','PPPOE','Balance') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `note` varchar(256) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT 'for note',
-  `admin_id` int NOT NULL DEFAULT '1'
+  `admin_id` int NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_users`;
 CREATE TABLE `tbl_users` (
-  `id` int UNSIGNED NOT NULL,
+  `id` int UNSIGNED NOT NULL AUTO_INCREMENT,
   `root` int NOT NULL DEFAULT '0' COMMENT 'for sub account',
   `photo` VARCHAR(128) NOT NULL DEFAULT '/admin.default.png',
   `username` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
@@ -183,12 +193,13 @@ CREATE TABLE `tbl_users` (
   `data` TEXT NULL DEFAULT NULL COMMENT 'to put additional data',
   `last_login` datetime DEFAULT NULL,
   `login_token` VARCHAR(40),
-  `creationdate` datetime NOT NULL
+  `creationdate` datetime NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_user_recharges`;
 CREATE TABLE `tbl_user_recharges` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `customer_id` int NOT NULL,
   `username` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `plan_id` int NOT NULL,
@@ -201,12 +212,13 @@ CREATE TABLE `tbl_user_recharges` (
   `method` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
   `routers` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `type` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `admin_id` int NOT NULL DEFAULT '1'
+  `admin_id` int NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_voucher`;
 CREATE TABLE `tbl_voucher` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `type` enum('Hotspot','PPPOE') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `routers` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `id_plan` int NOT NULL,
@@ -215,13 +227,14 @@ CREATE TABLE `tbl_voucher` (
   `status` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `used_date` DATETIME NULL DEFAULT NULL,
-  `generated_by` int NOT NULL DEFAULT '0' COMMENT 'id admin'
+  `generated_by` int NOT NULL DEFAULT '0' COMMENT 'id admin',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 DROP TABLE IF EXISTS `rad_acct`;
 CREATE TABLE `rad_acct` (
-  `id` bigint NOT NULL,
+  `id` bigint NOT NULL AUTO_INCREMENT,
   `acctsessionid` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
   `username` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
   `realm` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '',
@@ -235,7 +248,8 @@ CREATE TABLE `rad_acct` (
   `acctoutputoctets` BIGINT NOT NULL DEFAULT '0',
   `acctstatustype` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `macaddr` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `dateAdded` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `dateAdded` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `tbl_customers_inbox`;
@@ -324,7 +338,6 @@ CREATE TABLE tbl_message_logs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE `rad_acct`
-  ADD PRIMARY KEY (`id`),
   ADD KEY `username` (`username`),
   ADD KEY `framedipaddress` (`framedipaddress`),
   ADD KEY `acctsessionid` (`acctsessionid`),
@@ -334,45 +347,8 @@ ALTER TABLE `rad_acct`
 ALTER TABLE `rad_acct`
   MODIFY `id` bigint NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `tbl_appconfig`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `tbl_bandwidth`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `tbl_customers`
-  ADD PRIMARY KEY (`id`);
-
 ALTER TABLE `tbl_customers_fields`
-  ADD PRIMARY KEY (`id`),
   ADD KEY `customer_id` (`customer_id`);
-
-ALTER TABLE `tbl_logs`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `tbl_payment_gateway`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `tbl_plans`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `tbl_pool`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `tbl_routers`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `tbl_transactions`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `tbl_users`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `tbl_user_recharges`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `tbl_voucher`
-  ADD PRIMARY KEY (`id`);
 
 
 ALTER TABLE `tbl_appconfig`

@@ -45,6 +45,11 @@
 						<input type="text" class="form-control" id="dbhost" required name="dbhost">
 					</div>
 					<div class="form-group">
+						<label for="dbport">Database Port</label>
+						<input type="text" class="form-control" id="dbport" name="dbport" placeholder="3306">
+						<span class='help-block'>Set this for managed databases such as Aiven. Leave blank to use the MySQL default port.</span>
+					</div>
+					<div class="form-group">
 						<label for="dbuser">Database Username</label>
 						<input type="text" class="form-control" id="dbuser" required name="dbuser">
 					</div>
@@ -56,6 +61,21 @@
 					<div class="form-group">
 						<label for="dbname">Database Name</label>
 						<input type="text" class="form-control" id="dbname" required name="dbname">
+					</div>
+					<div class="form-group">
+						<label for="dbsslmode">SSL Mode</label>
+						<select class="form-control" id="dbsslmode" name="dbsslmode">
+							<option value="DISABLED">Disabled</option>
+							<option value="REQUIRED">Required</option>
+							<option value="VERIFY_CA">Verify CA</option>
+							<option value="VERIFY_IDENTITY">Verify Identity</option>
+						</select>
+						<span class='help-block'>For Aiven, use Required unless you have mounted the CA certificate and want certificate verification.</span>
+					</div>
+					<div class="form-group">
+						<label for="dbsslca">SSL CA Certificate Path</label>
+						<input type="text" class="form-control" id="dbsslca" name="dbsslca" placeholder="/run/secrets/aiven-ca.pem">
+						<span class='help-block'>Optional. Set this when your MySQL provider requires a CA file for TLS verification.</span>
 					</div>
 
                     <div class="form-group">

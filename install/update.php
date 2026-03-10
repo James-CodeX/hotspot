@@ -22,12 +22,19 @@
         <div class="span12">
             <h4> PHPNuxBill Updater </h4>
             <pre><?php
-            include '../config.php';
+            require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'system' . DIRECTORY_SEPARATOR . 'autoload' . DIRECTORY_SEPARATOR . 'Db.php';
+            $configFile = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config.php';
+            if (!file_exists($configFile) && Db::hasEnvironmentConfig()) {
+                $configFile = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'config.sample.php';
+            }
+            if (!file_exists($configFile)) {
+                die('Missing configuration. Create config.php or provide DATABASE_URL/DB_* environment variables.');
+            }
+            include $configFile;
+            Db::syncLegacyPasswordGlobals();
+            $dbConfig = Db::buildConfigFromGlobals('db');
             try{
-                $dbh = new pdo( "mysql:host=$db_host;dbname=$db_name",
-                    "$db_user",
-                    "$db_pass",
-                    array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+                $dbh = Db::createPdo($dbConfig);
 
                 echo "CREATE TABLE `tbl_payment_gateway` (
     `id` int(11) NOT NULL,

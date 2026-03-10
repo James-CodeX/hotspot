@@ -56,6 +56,25 @@ The problem with windows is hard to set cronjob, better Linux
 
 [Installation instructions](https://github.com/hotspotbilling/phpnuxbill/wiki)
 
+## Docker and External MySQL
+
+PHPNuxBill is a server-side PHP/Apache application. It is not suitable for Netlify deployment because Netlify does not run long-lived PHP/Apache applications. Use a Docker-capable host such as Render, Railway, Fly.io, DigitalOcean App Platform, or a VPS.
+
+This repository now supports booting directly from environment variables. If `DATABASE_URL` or the `DB_*` variables are present, the app will use that external MySQL server and will not redirect to `/install` just because `config.php` is missing.
+
+For local development against the same external database:
+
+1. Copy `.env.example` to `.env` and fill in your database credentials.
+2. Run `docker compose -f docker-compose.example.yml up --build`.
+3. Open the app on `http://localhost:8080`.
+
+Notes:
+
+- `DATABASE_URL` accepts Aiven-style MySQL URIs such as `mysql://user:pass@host:26019/defaultdb?ssl-mode=REQUIRED`.
+- For managed databases that require TLS, set `DB_SSL_MODE=REQUIRED`.
+- If you want certificate verification, mount the provider CA certificate into the container and set `DB_SSL_CA` to that file path.
+- Legacy `config.php` installs still work.
+
 ## Freeradius
 
 Support [Freeradius with Database](https://github.com/hotspotbilling/phpnuxbill/wiki/FreeRadius)
@@ -85,7 +104,6 @@ GNU General Public License version 2 or later
 
 see [LICENSE](LICENSE) file
 
-
 ## Donate to ibnux
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/ibnux)
@@ -103,6 +121,7 @@ a.n Ibnu Maksum
 - [https://github.com/sonyinside](https://github.com/sonyinside)
 
 ## Thanks
+
 We appreciate all people who are participating in this project.
 
 <a href="https://github.com/hotspotbilling/phpnuxbill/graphs/contributors">

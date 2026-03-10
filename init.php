@@ -39,9 +39,24 @@ function _autoloader($class)
 }
 spl_autoload_register('_autoloader');
 
-if (!file_exists($root_path . 'config.php')) {
-    $root_path .= '..' . DIRECTORY_SEPARATOR;
-    if (!file_exists($root_path . 'config.php')) {
+$primaryRootPath = $root_path;
+$secondaryRootPath = realpath($root_path . '..') . DIRECTORY_SEPARATOR;
+$configFile = $primaryRootPath . 'config.php';
+
+if (!file_exists($configFile) && file_exists($secondaryRootPath . 'config.php')) {
+    $root_path = $secondaryRootPath;
+    $configFile = $root_path . 'config.php';
+}
+
+if (!file_exists($configFile)) {
+    $configSampleFile = $root_path . 'config.sample.php';
+    if (!file_exists($configSampleFile) && file_exists($primaryRootPath . 'config.sample.php')) {
+        $root_path = $primaryRootPath;
+        $configSampleFile = $root_path . 'config.sample.php';
+    }
+    if (file_exists($configSampleFile) && Db::hasEnvironmentConfig()) {
+        $configFile = $configSampleFile;
+    } else {
         r2('./install');
     }
 }
@@ -65,22 +80,14 @@ if (!file_exists($UPLOAD_PATH . File::pathFixer('/notifications.default.json')))
     die();
 }
 
-require_once $root_path . 'config.php';
+require_once $configFile;
 require_once $root_path . File::pathFixer('system/orm.php');
 require_once $root_path . File::pathFixer('system/autoload/PEAR2/Autoload.php');
 include $root_path . File::pathFixer('system/autoload/Hookers.php');
 
-if ($db_password != null && ($db_pass == null || empty($db_pass))) {
-    // compability for old version
-    $db_pass = $db_password;
-}
-if ($db_pass != null) {
-    // compability for old version
-    $db_password = $db_pass;
-}
-ORM::configure("mysql:host=$db_host;dbname=$db_name");
-ORM::configure('username', $db_user);
-ORM::configure('password', $db_pass);
+Db::syncLegacyPasswordGlobals();
+$dbConfig = Db::buildConfigFromGlobals('db');
+Db::configureOrm($dbConfig);
 ORM::configure('return_result_sets', true);
 if ($_app_stage != 'Live') {
     ORM::configure('logging', true);
@@ -140,14 +147,8 @@ if (empty($http_proxy) && !empty($config['http_proxy'])) {
 date_default_timezone_set($config['timezone']);
 
 if ((!empty($radius_user) && $config['radius_enable']) || _post('radius_enable')) {
-    if (!empty($radius_password)) {
-        // compability for old version
-        $radius_pass = $radius_password;
-    }
-    ORM::configure("mysql:host=$radius_host;dbname=$radius_name", null, 'radius');
-    ORM::configure('username', $radius_user, 'radius');
-    ORM::configure('password', $radius_pass, 'radius');
-    ORM::configure('driver_options', array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'), 'radius');
+    $radiusConfig = Db::buildConfigFromGlobals('radius', $dbConfig);
+    Db::configureOrm($radiusConfig, 'radius');
     ORM::configure('return_result_sets', true, 'radius');
 }
 

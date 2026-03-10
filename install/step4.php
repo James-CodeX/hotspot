@@ -5,26 +5,41 @@
  *  by https://t.me/ibnux
  **/
 
+require_once dirname(__DIR__) . DIRECTORY_SEPARATOR . 'system' . DIRECTORY_SEPARATOR . 'autoload' . DIRECTORY_SEPARATOR . 'Db.php';
+
 //error_reporting (0);
 $appurl = $_POST['appurl'];
 $db_host = $_POST['dbhost'];
+$db_port = trim($_POST['dbport']);
 $db_user = $_POST['dbuser'];
 $db_pass = $_POST['dbpass'];
 $db_name = $_POST['dbname'];
+$db_ssl_mode = Db::normalizeSslMode($_POST['dbsslmode']);
+$db_ssl_ca = trim($_POST['dbsslca']);
+$db_charset = 'utf8mb4';
 $cn = '0';
+$dbConfig = [
+    'host' => $db_host,
+    'port' => $db_port,
+    'user' => $db_user,
+    'pass' => $db_pass,
+    'name' => $db_name,
+    'charset' => $db_charset,
+    'ssl_mode' => $db_ssl_mode,
+    'ssl_ca' => $db_ssl_ca,
+    'ssl_verify_server_cert' => null,
+];
 try {
-    $dbh = new pdo(
-        "mysql:host=$db_host;dbname=$db_name",
-        "$db_user",
-        "$db_pass",
-        array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
-    );
+    $dbh = Db::createPdo($dbConfig);
     $cn = '1';
 } catch (PDOException $ex) {
     $cn = '0';
 }
 
 if ($cn == '1') {
+    $export = function ($value) {
+        return var_export($value, true);
+    };
     if (isset($_POST['radius']) && $_POST['radius'] == 'yes') {
         $input = '<?php
 
@@ -37,16 +52,26 @@ define("APP_URL", $protocol . $host . $baseDir);
 $_app_stage = "Live";
 
 // Database PHPNuxBill
-$db_host	    = "' . $db_host . '";
-$db_user        = "' . $db_user . '";
-$db_pass    	= "' . $db_pass . '";
-$db_name	    = "' . $db_name . '";
+$db_host        = ' . $export($db_host) . ';
+$db_port        = ' . $export($db_port) . ';
+$db_user        = ' . $export($db_user) . ';
+$db_pass        = ' . $export($db_pass) . ';
+$db_name        = ' . $export($db_name) . ';
+$db_charset     = ' . $export($db_charset) . ';
+$db_ssl_mode    = ' . $export($db_ssl_mode) . ';
+$db_ssl_ca      = ' . $export($db_ssl_ca) . ';
+$db_password    = $db_pass;
 
 // Database Radius
-$radius_host	    = "' . $db_host . '";
-$radius_user        = "' . $db_user . '";
-$radius_pass    	= "' . $db_pass . '";
-$radius_name	    = "' . $db_name . '";
+$radius_host        = ' . $export($db_host) . ';
+$radius_port        = ' . $export($db_port) . ';
+$radius_user        = ' . $export($db_user) . ';
+$radius_pass        = ' . $export($db_pass) . ';
+$radius_name        = ' . $export($db_name) . ';
+$radius_charset     = ' . $export($db_charset) . ';
+$radius_ssl_mode    = ' . $export($db_ssl_mode) . ';
+$radius_ssl_ca      = ' . $export($db_ssl_ca) . ';
+$radius_password    = $radius_pass;
 
 if($_app_stage!="Live"){
     error_reporting(E_ERROR);
@@ -68,10 +93,15 @@ define("APP_URL", $protocol . $host . $baseDir);
 $_app_stage = "Live";
 
 // Database PHPNuxBill
-$db_host	    = "' . $db_host . '";
-$db_user        = "' . $db_user . '";
-$db_pass	    = "' . $db_pass . '";
-$db_name	    = "' . $db_name . '";
+$db_host        = ' . $export($db_host) . ';
+$db_port        = ' . $export($db_port) . ';
+$db_user        = ' . $export($db_user) . ';
+$db_pass        = ' . $export($db_pass) . ';
+$db_name        = ' . $export($db_name) . ';
+$db_charset     = ' . $export($db_charset) . ';
+$db_ssl_mode    = ' . $export($db_ssl_mode) . ';
+$db_ssl_ca      = ' . $export($db_ssl_ca) . ';
+$db_password    = $db_pass;
 
 if($_app_stage!="Live"){
     error_reporting(E_ERROR);

@@ -971,10 +971,11 @@ switch ($action) {
             _alert(Lang::T('You do not have permission to access this page'), 'danger', "dashboard");
         }
 
-        $dbc = new mysqli($db_host, $db_user, $db_pass, $db_name);
-        if ($result = $dbc->query('SHOW TABLE STATUS')) {
+        $dbc = Db::createPdo(Db::buildConfigFromGlobals('db'));
+        $result = $dbc->query('SHOW TABLE STATUS');
+        if ($result) {
             $tables = array();
-            while ($row = $result->fetch_array()) {
+            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
                 $tables[$row['Name']]['rows'] = ORM::for_table($row["Name"])->count();
                 $tables[$row['Name']]['name'] = $row["Name"];
             }

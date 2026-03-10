@@ -6,12 +6,19 @@
  * This script is for updating PHPNuxBill
  **/
 session_start();
-include "config.php";
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'system' . DIRECTORY_SEPARATOR . 'autoload' . DIRECTORY_SEPARATOR . 'Db.php';
 
-if($db_password != null && ($db_pass == null || empty($db_pass))){
-    // compability for old version
-    $db_pass = $db_password;
+$configFile = __DIR__ . DIRECTORY_SEPARATOR . 'config.php';
+if (!file_exists($configFile) && Db::hasEnvironmentConfig()) {
+    $configFile = __DIR__ . DIRECTORY_SEPARATOR . 'config.sample.php';
 }
+if (!file_exists($configFile)) {
+    die('Missing configuration. Create config.php or provide DATABASE_URL/DB_* environment variables.');
+}
+include $configFile;
+
+Db::syncLegacyPasswordGlobals();
+$dbConfig = Db::buildConfigFromGlobals('db');
 
 if (empty($update_url)) {
     $update_url = 'https://github.com/hotspotbilling/phpnuxbill/archive/refs/heads/master.zip';
@@ -105,12 +112,7 @@ if (empty($step)) {
     }
 } else if ($step == 4) {
     if (file_exists("system/updates.json")) {
-        $db = new pdo(
-            "mysql:host=$db_host;dbname=$db_name",
-            $db_user,
-            $db_pass,
-            array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
-        );
+        $db = Db::createPdo($dbConfig);
 
         $updates = json_decode(file_get_contents("system/updates.json"), true);
         $dones = [];
