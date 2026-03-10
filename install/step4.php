@@ -51,7 +51,27 @@ if (!empty($_SERVER["HTTP_X_FORWARDED_PROTO"])) {
 }
 $isHttps = ((!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") || (!empty($_SERVER["REQUEST_SCHEME"]) && $_SERVER["REQUEST_SCHEME"] === "https") || (!empty($_SERVER["SERVER_PORT"]) && (string) $_SERVER["SERVER_PORT"] === "443") || (!empty($_SERVER["HTTP_X_FORWARDED_SSL"]) && $_SERVER["HTTP_X_FORWARDED_SSL"] === "on") || (!empty($_SERVER["HTTP_X_FORWARDED_PORT"]) && (string) $_SERVER["HTTP_X_FORWARDED_PORT"] === "443") || strtolower($forwardedProto) === "https");
 $protocol = $isHttps ? "https://" : "http://";
+$forwardedPort = !empty($_SERVER["HTTP_X_FORWARDED_PORT"]) ? trim(explode(",", $_SERVER["HTTP_X_FORWARDED_PORT"])[0]) : "";
+$runtimePort = getenv("PORT") ?: "";
 $host = !empty($_SERVER["HTTP_X_FORWARDED_HOST"]) ? trim(explode(",", $_SERVER["HTTP_X_FORWARDED_HOST"])[0]) : $_SERVER["HTTP_HOST"];
+$parsedHost = parse_url($protocol . $host);
+if (!empty($parsedHost["host"])) {
+    $hostName = $parsedHost["host"];
+    $hostPort = isset($parsedHost["port"]) ? (string) $parsedHost["port"] : "";
+    if ($hostPort !== "") {
+        if ($forwardedPort !== "" && $hostPort !== $forwardedPort) {
+            $hostPort = $forwardedPort;
+        } elseif ($runtimePort !== "" && $hostPort === (string) $runtimePort) {
+            $hostPort = $isHttps ? "443" : "80";
+        }
+    } elseif ($forwardedPort !== "" && $forwardedPort !== "80" && $forwardedPort !== "443") {
+        $hostPort = $forwardedPort;
+    }
+    $host = $hostName;
+    if (($isHttps && $hostPort !== "443" && $hostPort !== "") || (!$isHttps && $hostPort !== "80" && $hostPort !== "")) {
+        $host .= ":" . $hostPort;
+    }
+}
 $baseDir = rtrim(dirname($_SERVER["SCRIPT_NAME"]), "/\\\\");
 define("APP_URL", $protocol . $host . $baseDir);
 
@@ -99,7 +119,27 @@ if (!empty($_SERVER["HTTP_X_FORWARDED_PROTO"])) {
 }
 $isHttps = ((!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") || (!empty($_SERVER["REQUEST_SCHEME"]) && $_SERVER["REQUEST_SCHEME"] === "https") || (!empty($_SERVER["SERVER_PORT"]) && (string) $_SERVER["SERVER_PORT"] === "443") || (!empty($_SERVER["HTTP_X_FORWARDED_SSL"]) && $_SERVER["HTTP_X_FORWARDED_SSL"] === "on") || (!empty($_SERVER["HTTP_X_FORWARDED_PORT"]) && (string) $_SERVER["HTTP_X_FORWARDED_PORT"] === "443") || strtolower($forwardedProto) === "https");
 $protocol = $isHttps ? "https://" : "http://";
+$forwardedPort = !empty($_SERVER["HTTP_X_FORWARDED_PORT"]) ? trim(explode(",", $_SERVER["HTTP_X_FORWARDED_PORT"])[0]) : "";
+$runtimePort = getenv("PORT") ?: "";
 $host = !empty($_SERVER["HTTP_X_FORWARDED_HOST"]) ? trim(explode(",", $_SERVER["HTTP_X_FORWARDED_HOST"])[0]) : $_SERVER["HTTP_HOST"];
+$parsedHost = parse_url($protocol . $host);
+if (!empty($parsedHost["host"])) {
+    $hostName = $parsedHost["host"];
+    $hostPort = isset($parsedHost["port"]) ? (string) $parsedHost["port"] : "";
+    if ($hostPort !== "") {
+        if ($forwardedPort !== "" && $hostPort !== $forwardedPort) {
+            $hostPort = $forwardedPort;
+        } elseif ($runtimePort !== "" && $hostPort === (string) $runtimePort) {
+            $hostPort = $isHttps ? "443" : "80";
+        }
+    } elseif ($forwardedPort !== "" && $forwardedPort !== "80" && $forwardedPort !== "443") {
+        $hostPort = $forwardedPort;
+    }
+    $host = $hostName;
+    if (($isHttps && $hostPort !== "443" && $hostPort !== "") || (!$isHttps && $hostPort !== "80" && $hostPort !== "")) {
+        $host .= ":" . $hostPort;
+    }
+}
 $baseDir = rtrim(dirname($_SERVER["SCRIPT_NAME"]), "/\\\\");
 define("APP_URL", $protocol . $host . $baseDir);
 
