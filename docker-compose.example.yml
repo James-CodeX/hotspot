@@ -10,7 +10,7 @@ services:
       - .env
     environment:
       TZ: ${TZ:-Africa/Nairobi}
-      APP_URL: ${APP_URL:-http://localhost:8080}
+      APP_URL: ${APP_URL:-}
       DATABASE_URL: ${DATABASE_URL:-}
       DB_HOST: ${DB_HOST:-}
       DB_PORT: ${DB_PORT:-}

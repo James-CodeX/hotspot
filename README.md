@@ -71,6 +71,8 @@ For local development against the same external database:
 Notes:
 
 - `DATABASE_URL` accepts Aiven-style MySQL URIs such as `mysql://user:pass@host:26019/defaultdb?ssl-mode=REQUIRED`.
+- `APP_URL` is optional. If omitted, PHPNuxBill derives its base URL from the incoming request host.
+- Set `APP_URL` only when you need to force a canonical public URL, such as behind a reverse proxy or when serving from a subpath.
 - For managed databases that require TLS, set `DB_SSL_MODE=REQUIRED`.
 - If you want certificate verification, mount the provider CA certificate into the container and set `DB_SSL_CA` to that file path.
 - Legacy `config.php` installs still work.
