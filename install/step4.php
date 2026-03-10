@@ -169,7 +169,7 @@ if($_app_stage!="Live"){
             <h4> PHPNuxBill Installer </h4>
             <?php
             if ($cn == '1') {
-            ?>
+                ?>
                 <p><strong>Config File Created and Database Imported.</strong><br></p>
                 <form action="step5.php" method="post">
                     <fieldset>
@@ -177,17 +177,18 @@ if($_app_stage!="Live"){
                         <button type='submit' class='btn btn-primary'>Continue</button>
                     </fieldset>
                 </form>
-            <?php
+                <?php
             } elseif ($cn == '2') {
-            ?>
+                ?>
                 <p> MySQL Connection was successfull. An error occured while adding data on MySQL. Unsuccessfull
-                    Installation. Please refer manual installation in the website github.com/ibnux/phpnuxbill/wiki or Contact Telegram @ibnux  for
+                    Installation. Please refer manual installation in the website github.com/ibnux/phpnuxbill/wiki or
+                    Contact Telegram @ibnux for
                     helping on installation</p>
-            <?php
+                <?php
             } else {
-            ?>
+                ?>
                 <p> MySQL Connection Failed.</p>
-            <?php
+                <?php
             }
             ?>
         </div>
