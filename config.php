@@ -28,11 +28,34 @@ $isHttps = (
 );
 
 $protocol = $isHttps ? "https://" : "http://";
+$forwardedPort = !empty($_SERVER['HTTP_X_FORWARDED_PORT']) ? trim(explode(',', $_SERVER['HTTP_X_FORWARDED_PORT'])[0]) : '';
+$runtimePort = class_exists('Db') ? Db::env('PORT', '') : '';
 
 // Check if HTTP_HOST is set, otherwise use a default value or SERVER_NAME
 $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost');
 if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
     $host = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_HOST'])[0]);
+}
+
+$parsedHost = parse_url($protocol . $host);
+if (!empty($parsedHost['host'])) {
+    $hostName = $parsedHost['host'];
+    $hostPort = isset($parsedHost['port']) ? (string) $parsedHost['port'] : '';
+
+    if ($hostPort !== '') {
+        if ($forwardedPort !== '' && $hostPort !== $forwardedPort) {
+            $hostPort = $forwardedPort;
+        } elseif ($runtimePort !== '' && $hostPort === (string) $runtimePort) {
+            $hostPort = $isHttps ? '443' : '80';
+        }
+    } elseif ($forwardedPort !== '' && $forwardedPort !== '80' && $forwardedPort !== '443') {
+        $hostPort = $forwardedPort;
+    }
+
+    $host = $hostName;
+    if (($isHttps && $hostPort !== '443' && $hostPort !== '') || (!$isHttps && $hostPort !== '80' && $hostPort !== '')) {
+        $host .= ':' . $hostPort;
+    }
 }
 
 $baseDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');

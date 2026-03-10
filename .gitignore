@@ -1,6 +1,4 @@
-.env
 .DS_Store
-.vscode/
 ui/ui/compiled
 ui/compiled/*.php
 ui/cache/*.php
@@ -58,3 +56,5 @@ docs/**
 !docs/insomnia.rest.json
 !system/uploads/paid.png
 system/uploads/invoices/**
+config.bat
+node_modules
