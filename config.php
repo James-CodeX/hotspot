@@ -11,11 +11,29 @@ if (class_exists('Db')) {
     Db::loadDotEnv(__DIR__ . DIRECTORY_SEPARATOR . '.env');
 }
 
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ||
-    (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ? "https://" : "http://";
+$forwardedProto = '';
+if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+    $forwardedProto = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'])[0]);
+} elseif (!empty($_SERVER['HTTP_FORWARDED']) && preg_match('/proto=([^;]+)/i', $_SERVER['HTTP_FORWARDED'], $matches)) {
+    $forwardedProto = trim($matches[1], '" ');
+}
+
+$isHttps = (
+    (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+    (!empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] === 'https') ||
+    (!empty($_SERVER['SERVER_PORT']) && (string) $_SERVER['SERVER_PORT'] === '443') ||
+    (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on') ||
+    (!empty($_SERVER['HTTP_X_FORWARDED_PORT']) && (string) $_SERVER['HTTP_X_FORWARDED_PORT'] === '443') ||
+    strtolower($forwardedProto) === 'https'
+);
+
+$protocol = $isHttps ? "https://" : "http://";
 
 // Check if HTTP_HOST is set, otherwise use a default value or SERVER_NAME
 $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : (isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : 'localhost');
+if (!empty($_SERVER['HTTP_X_FORWARDED_HOST'])) {
+    $host = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_HOST'])[0]);
+}
 
 $baseDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 $defaultAppUrl = $protocol . $host . $baseDir;
