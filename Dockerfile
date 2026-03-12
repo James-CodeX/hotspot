@@ -21,7 +21,11 @@ RUN sed -i 's|AllowOverride None|AllowOverride All|g' /etc/apache2/apache2.conf
 
 COPY . /var/www/html
 
-RUN chown -R www-data:www-data /var/www/html \
+RUN mkdir -p /var/www/html/system/uploads \
+        /var/www/html/system/cache \
+        /var/www/html/ui/cache \
+        /var/www/html/ui/compiled \
+    && chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
     && chmod -R 775 /var/www/html/system/uploads \
     && chmod -R 775 /var/www/html/system/cache \
