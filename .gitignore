@@ -57,5 +57,8 @@ docs/**
 !system/uploads/paid.png
 system/uploads/invoices**/
 .env
+.env copy
+.env.copy.example
+config.php
 docker-compose.yml
 

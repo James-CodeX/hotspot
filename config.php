@@ -1,6 +1,6 @@
 <?php
 
-// Load .env file for local dev (PHP built-in server / no system env vars set)
+// Load .env for local dev (PHP built-in server doesn't read system env vars)
 if (getenv('DB_HOST') === false && file_exists(__DIR__ . '/.env')) {
     foreach (file(__DIR__ . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
         if ($line[0] === '#' || strpos($line, '=') === false) continue;
@@ -21,14 +21,14 @@ $_app_stage = 'Live'; # Do not change this
 
 // Database connection — env vars take precedence (Docker / cloud deployments)
 $db_host    = getenv('DB_HOST') ?: 'localhost';
-$db_port    = getenv('DB_PORT') ?: '';       // e.g. 26019 for Aiven, blank = default 3306
+$db_port    = getenv('DB_PORT') ?: '';
 $db_user    = getenv('DB_USER') ?: 'root';
 $db_pass    = getenv('DB_PASS') ?: '';
 $db_name    = getenv('DB_NAME') ?: 'phpnuxbill';
 
 // SSL/TLS — required for cloud databases (Aiven, PlanetScale, etc.)
-$db_ssl     = filter_var(getenv('DB_SSL') ?: false, FILTER_VALIDATE_BOOLEAN);  // true = require SSL
-$db_ssl_ca  = getenv('DB_SSL_CA') ?: '';     // path to CA cert for full verification (optional)
+$db_ssl     = filter_var(getenv('DB_SSL') ?: false, FILTER_VALIDATE_BOOLEAN);
+$db_ssl_ca  = getenv('DB_SSL_CA') ?: '';
 
 error_reporting(E_ERROR);
 if ($_app_stage !== 'Live') {

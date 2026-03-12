@@ -20,12 +20,14 @@ if ($db_port !== '') {
     $dsn .= ";port={$db_port}";
 }
 
+// PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT was moved to Pdo\Mysql in PHP 8.5
+$_ssl_verify_attr = class_exists('Pdo\Mysql') ? Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT;
 $pdo_opts = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
 if (!empty($db_ssl_ca)) {
     $pdo_opts[PDO::MYSQL_ATTR_SSL_CA] = $db_ssl_ca;
-    $pdo_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
+    $pdo_opts[$_ssl_verify_attr] = true;
 } elseif ($db_ssl) {
-    $pdo_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+    $pdo_opts[$_ssl_verify_attr] = false;
 }
 
 try {
@@ -83,6 +85,10 @@ if ($_app_stage !== "Live") {
     please create a file named - config.php with following contents- <br/>" . htmlspecialchars($input));
     fwrite($fh, $input);
     fclose($fh);
+
+    // Cloud DBs (Aiven, RDS) enforce sql_require_primary_key=ON globally.
+    // Disable it for this session so the dump (which adds PKs via ALTER TABLE) can import cleanly.
+    try { $dbh->exec('SET SESSION sql_require_primary_key=0'); } catch (PDOException $e) { /* no permission — ignore, may still work */ }
 
     $sql = file_get_contents('phpnuxbill.sql');
     $dbh->exec($sql);

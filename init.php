@@ -88,12 +88,14 @@ ORM::configure('password', $db_pass);
 ORM::configure('return_result_sets', true);
 
 // SSL/TLS for cloud/external databases (Aiven, RDS, etc.)
+// PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT was moved to Pdo\Mysql in PHP 8.5
+$_ssl_verify_attr = class_exists('Pdo\Mysql') ? Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT;
 $_driver_opts = [];
 if (!empty($db_ssl_ca)) {
     $_driver_opts[PDO::MYSQL_ATTR_SSL_CA] = $db_ssl_ca;
-    $_driver_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
+    $_driver_opts[$_ssl_verify_attr] = true;
 } elseif (!empty($db_ssl)) {
-    $_driver_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+    $_driver_opts[$_ssl_verify_attr] = false;
 }
 if (!empty($_driver_opts)) {
     ORM::configure('driver_options', $_driver_opts);
@@ -173,9 +175,9 @@ if ((!empty($radius_user) && $config['radius_enable']) || _post('radius_enable')
     $_radius_opts = [];
     if (!empty($db_ssl_ca)) {
         $_radius_opts[PDO::MYSQL_ATTR_SSL_CA] = $db_ssl_ca;
-        $_radius_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
+        $_radius_opts[$_ssl_verify_attr] = true;
     } elseif (!empty($db_ssl)) {
-        $_radius_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+        $_radius_opts[$_ssl_verify_attr] = false;
     }
     if (!empty($_radius_opts)) {
         ORM::configure('driver_options', $_radius_opts, 'radius');
