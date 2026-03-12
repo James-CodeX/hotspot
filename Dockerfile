@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libzip-dev \
     libonig-dev \
+    libcurl4-openssl-dev \
     zip \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
