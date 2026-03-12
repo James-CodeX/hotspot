@@ -1,11 +1,9 @@
 .DS_Store
-.vscode/
 ui/ui/compiled
 ui/compiled/*.php
 ui/cache/*.php
 test.php
 sms.php
-pages/
 system/cache/**
 system/plugin/*
 !system/cache/index.html
@@ -55,9 +53,10 @@ docs/**
 !docs/insomnia.rest.json
 !system/uploads/paid.png
 system/uploads/invoices**/
-.env
 .env copy
 .env.copy.example
 config.php
 docker-compose.yml
 
+config.bat
+node_modules
