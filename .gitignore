@@ -1,6 +1,4 @@
-config.php
 .DS_Store
-.vscode/
 ui/ui/compiled
 ui/compiled/*.php
 ui/cache/*.php
@@ -49,7 +47,6 @@ system/devices/**
 !system/devices/MikrotikPppoeCustom.php
 !system/devices/MikrotikHotspot.php
 /.vs
-docker-compose.yml
 docs/**
 !docs/*.html
 !docs/*.md
@@ -57,4 +54,7 @@ docs/**
 .idea
 !docs/insomnia.rest.json
 !system/uploads/paid.png
-system/uploads/invoices/**
+system/uploads/invoices**/
+
+config.bat
+node_modules
