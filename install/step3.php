@@ -33,7 +33,7 @@
 
 			<form action="step4.php" method="post">
 				<fieldset>
-					<legend>Database Connection &amp Site config</legend>
+					<legend>Database Connection &amp; Site config</legend>
 
 					<div class="form-group">
 						<label for="appurl">Application URL</label>
@@ -43,6 +43,12 @@
 					<div class="form-group">
 						<label for="dbhost">Database Host</label>
 						<input type="text" class="form-control" id="dbhost" required name="dbhost">
+						<span class='help-block'>e.g. <code>localhost</code> or <code>phpnuxbill-xx.k.aivencloud.com</code></span>
+					</div>
+					<div class="form-group">
+						<label for="dbport">Database Port</label>
+						<input type="text" class="form-control" id="dbport" name="dbport" placeholder="3306">
+						<span class='help-block'>Leave blank for default 3306. Cloud databases often use a custom port (e.g. Aiven uses 26019).</span>
 					</div>
 					<div class="form-group">
 						<label for="dbuser">Database Username</label>
@@ -50,14 +56,21 @@
 					</div>
 					<div class="form-group">
 						<label for="dbpass">Database Password</label>
-						<input type="text" class="form-control" id="dbpass" required name="dbpass">
+						<input type="password" class="form-control" id="dbpass" required name="dbpass">
 					</div>
-
 					<div class="form-group">
 						<label for="dbname">Database Name</label>
 						<input type="text" class="form-control" id="dbname" required name="dbname">
 					</div>
-
+					<div class="form-group">
+						<label><input type="checkbox" name="dbssl" id="dbssl" value="yes"> Require SSL/TLS</label>
+						<span class='help-block'>Enable for cloud/external databases (Aiven, RDS, PlanetScale, etc.).</span>
+					</div>
+					<div class="form-group" id="sslca_group" style="display:none;">
+						<label for="dbsslca">Path to SSL CA Certificate <small>(optional)</small></label>
+						<input type="text" class="form-control" id="dbsslca" name="dbsslca" placeholder="/etc/ssl/certs/ca.pem">
+						<span class='help-block'>Full server path to the CA certificate file for full SSL verification. Leave blank to skip certificate verification (still encrypted).</span>
+					</div>
                     <div class="form-group">
 						<label for="radius"><input type="checkbox" class="form-" id="radius" name="radius" value="yes"> Install <a href="https://github.com/hotspotbilling/phpnuxbill/wiki/FreeRadius" target="_blank">Radius</a> Table?</label>
 						<span class='help-block'>You Don't need this if you planning to use <a href="https://github.com/hotspotbilling/phpnuxbill/wiki/FreeRadius-Rest" target="_blank">FreeRadius REST</a></span>
@@ -66,6 +79,11 @@
 					<button type="submit" class="btn btn-primary">Submit</button>
 				</fieldset>
 			</form>
+			<script>
+				document.getElementById('dbssl').addEventListener('change', function() {
+					document.getElementById('sslca_group').style.display = this.checked ? 'block' : 'none';
+				});
+			</script>
 		</div>
 	</div>
 	<div class="footer">Copyright &copy; 2021 PHPNuxBill. All Rights Reserved<br/><br/></div>

@@ -78,10 +78,28 @@ if ($db_pass != null) {
     // compability for old version
     $db_password = $db_pass;
 }
-ORM::configure("mysql:host=$db_host;dbname=$db_name");
+$_dsn = "mysql:host={$db_host};dbname={$db_name};charset=utf8mb4";
+if (!empty($db_port)) {
+    $_dsn .= ";port={$db_port}";
+}
+ORM::configure($_dsn);
 ORM::configure('username', $db_user);
 ORM::configure('password', $db_pass);
 ORM::configure('return_result_sets', true);
+
+// SSL/TLS for cloud/external databases (Aiven, RDS, etc.)
+$_driver_opts = [];
+if (!empty($db_ssl_ca)) {
+    $_driver_opts[PDO::MYSQL_ATTR_SSL_CA] = $db_ssl_ca;
+    $_driver_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
+} elseif (!empty($db_ssl)) {
+    $_driver_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+}
+if (!empty($_driver_opts)) {
+    ORM::configure('driver_options', $_driver_opts);
+}
+unset($_dsn, $_driver_opts);
+
 if ($_app_stage != 'Live') {
     ORM::configure('logging', true);
 }
@@ -144,11 +162,26 @@ if ((!empty($radius_user) && $config['radius_enable']) || _post('radius_enable')
         // compability for old version
         $radius_pass = $radius_password;
     }
-    ORM::configure("mysql:host=$radius_host;dbname=$radius_name", null, 'radius');
+    $_radius_port = !empty($radius_port) ? $radius_port : ($db_port ?? '');
+    $_radius_dsn  = "mysql:host={$radius_host};dbname={$radius_name};charset=utf8mb4";
+    if (!empty($_radius_port)) {
+        $_radius_dsn .= ";port={$_radius_port}";
+    }
+    ORM::configure($_radius_dsn, null, 'radius');
     ORM::configure('username', $radius_user, 'radius');
     ORM::configure('password', $radius_pass, 'radius');
-    ORM::configure('driver_options', array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'), 'radius');
+    $_radius_opts = [];
+    if (!empty($db_ssl_ca)) {
+        $_radius_opts[PDO::MYSQL_ATTR_SSL_CA] = $db_ssl_ca;
+        $_radius_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
+    } elseif (!empty($db_ssl)) {
+        $_radius_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+    }
+    if (!empty($_radius_opts)) {
+        ORM::configure('driver_options', $_radius_opts, 'radius');
+    }
     ORM::configure('return_result_sets', true, 'radius');
+    unset($_radius_port, $_radius_dsn, $_radius_opts);
 }
 
 

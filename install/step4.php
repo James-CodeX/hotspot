@@ -5,94 +5,90 @@
  *  by https://t.me/ibnux
  **/
 
-//error_reporting (0);
-$appurl = $_POST['appurl'];
+$appurl  = $_POST['appurl'];
 $db_host = $_POST['dbhost'];
+$db_port = trim($_POST['dbport'] ?? '');
 $db_user = $_POST['dbuser'];
 $db_pass = $_POST['dbpass'];
 $db_name = $_POST['dbname'];
+$db_ssl  = isset($_POST['dbssl']) && $_POST['dbssl'] === 'yes';
+$db_ssl_ca = trim($_POST['dbsslca'] ?? '');
 $cn = '0';
+
+$dsn = "mysql:host={$db_host};dbname={$db_name};charset=utf8mb4";
+if ($db_port !== '') {
+    $dsn .= ";port={$db_port}";
+}
+
+$pdo_opts = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+if (!empty($db_ssl_ca)) {
+    $pdo_opts[PDO::MYSQL_ATTR_SSL_CA] = $db_ssl_ca;
+    $pdo_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
+} elseif ($db_ssl) {
+    $pdo_opts[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+}
+
 try {
-    $dbh = new pdo(
-        "mysql:host=$db_host;dbname=$db_name",
-        "$db_user",
-        "$db_pass",
-        array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
-    );
+    $dbh = new PDO($dsn, $db_user, $db_pass, $pdo_opts);
     $cn = '1';
 } catch (PDOException $ex) {
     $cn = '0';
 }
 
 if ($cn == '1') {
+    $ssl_line      = $db_ssl    ? 'true'  : 'false';
+    $ssl_ca_line   = addslashes($db_ssl_ca);
+    $port_line     = addslashes($db_port);
+
+    $radius_block = '';
     if (isset($_POST['radius']) && $_POST['radius'] == 'yes') {
-        $input = '<?php
-
-$protocol = (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off" || $_SERVER["SERVER_PORT"] == 443) ? "https://" : "http://";
-$host = $_SERVER["HTTP_HOST"];
-$baseDir = rtrim(dirname($_SERVER["SCRIPT_NAME"]), "/\\\\");
-define("APP_URL", $protocol . $host . $baseDir);
-
-// Live, Dev, Demo
-$_app_stage = "Live";
-
-// Database PHPNuxBill
-$db_host	    = "' . $db_host . '";
-$db_user        = "' . $db_user . '";
-$db_pass    	= "' . $db_pass . '";
-$db_name	    = "' . $db_name . '";
-
+        $radius_block = '
 // Database Radius
-$radius_host	    = "' . $db_host . '";
-$radius_user        = "' . $db_user . '";
-$radius_pass    	= "' . $db_pass . '";
-$radius_name	    = "' . $db_name . '";
+$radius_host    = getenv(\'RADIUS_HOST\') ?: \'' . addslashes($db_host) . '\';
+$radius_user    = getenv(\'RADIUS_USER\') ?: \'' . addslashes($db_user) . '\';
+$radius_pass    = getenv(\'RADIUS_PASS\') ?: \'' . addslashes($db_pass) . '\';
+$radius_name    = getenv(\'RADIUS_NAME\') ?: \'' . addslashes($db_name) . '\';
+';
+    }
 
-if($_app_stage!="Live"){
-    error_reporting(E_ERROR);
-    ini_set("display_errors", 1);
-    ini_set("display_startup_errors", 1);
-}else{
-    error_reporting(E_ERROR);
-    ini_set("display_errors", 0);
-    ini_set("display_startup_errors", 0);
-}';
-    } else {
-        $input = '<?php
-$protocol = (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off" || $_SERVER["SERVER_PORT"] == 443) ? "https://" : "http://";
-$host = $_SERVER["HTTP_HOST"];
+    $input = '<?php
+
+$protocol = (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off" || (isset($_SERVER["SERVER_PORT"]) && $_SERVER["SERVER_PORT"] == 443)) ? "https://" : "http://";
+$host = isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : (isset($_SERVER["SERVER_NAME"]) ? $_SERVER["SERVER_NAME"] : "localhost");
 $baseDir = rtrim(dirname($_SERVER["SCRIPT_NAME"]), "/\\\\");
 define("APP_URL", $protocol . $host . $baseDir);
 
-// Live, Dev, Demo
 $_app_stage = "Live";
 
-// Database PHPNuxBill
-$db_host	    = "' . $db_host . '";
-$db_user        = "' . $db_user . '";
-$db_pass	    = "' . $db_pass . '";
-$db_name	    = "' . $db_name . '";
-
-if($_app_stage!="Live"){
-    error_reporting(E_ERROR);
+// Database connection — env vars override installer values (Docker / cloud)
+$db_host   = getenv("DB_HOST") ?: "' . addslashes($db_host) . '";
+$db_port   = getenv("DB_PORT") ?: "' . $port_line . '";
+$db_user   = getenv("DB_USER") ?: "' . addslashes($db_user) . '";
+$db_pass   = getenv("DB_PASS") ?: "' . addslashes($db_pass) . '";
+$db_name   = getenv("DB_NAME") ?: "' . addslashes($db_name) . '";
+$db_ssl    = filter_var(getenv("DB_SSL") ?: ' . $ssl_line . ', FILTER_VALIDATE_BOOLEAN);
+$db_ssl_ca = getenv("DB_SSL_CA") ?: "' . $ssl_ca_line . '";
+' . $radius_block . '
+error_reporting(E_ERROR);
+if ($_app_stage !== "Live") {
     ini_set("display_errors", 1);
     ini_set("display_startup_errors", 1);
-}else{
-    error_reporting(E_ERROR);
+} else {
     ini_set("display_errors", 0);
     ini_set("display_startup_errors", 0);
 }';
-    }
+
     $wConfig = "../config.php";
     $fh = fopen($wConfig, 'w') or die("Can't create config file, your server does not support 'fopen' function,
-	please create a file named - config.php with following contents- <br/>$input");
+    please create a file named - config.php with following contents- <br/>" . htmlspecialchars($input));
     fwrite($fh, $input);
     fclose($fh);
+
     $sql = file_get_contents('phpnuxbill.sql');
-    $qr = $dbh->exec($sql);
+    $dbh->exec($sql);
     if (isset($_POST['radius']) && $_POST['radius'] == 'yes') {
         $sql = file_get_contents('radius.sql');
-        $qrs = $dbh->exec($sql);
+        $dbh->exec($sql);
     }
 } else {
     header("location: step3.php?_error=1");

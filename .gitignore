@@ -57,4 +57,5 @@ docs/**
 !system/uploads/paid.png
 system/uploads/invoices**/
 .env
+docker-compose.yml
 
