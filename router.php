@@ -7,7 +7,8 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $filePath = __DIR__ . str_replace('/', DIRECTORY_SEPARATOR, $uri);
 
 // Serve real static files explicitly (return false is unreliable with spaces in path)
-if ($uri !== '/' && file_exists($filePath) && !is_dir($filePath)) {
+// Explicitly exclude .php files — they must always be executed, never read raw.
+if ($uri !== '/' && file_exists($filePath) && !is_dir($filePath) && strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) !== 'php') {
     $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
     $mime = [
         'css'  => 'text/css',
