@@ -1,0 +1,17 @@
+# Secrets — must never be baked into the image
+.env
+.env.local
+.env.*.local
+
+# Git history
+.git
+.gitignore
+
+# Local dev only
+router.php
+
+# IDE / OS noise
+.vscode
+.idea
+.DS_Store
+*.zip
